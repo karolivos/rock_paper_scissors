@@ -1,57 +1,88 @@
+// Pirma reik gauti getComputerChoice;
+//Antra reikia padaryti logika kaip zaidziamas zaidimas;
+//Trecia reikia suzaisti round su zaidejo pasirinkimu
+
 const choices = ["Rock", "Paper", "Scissors"];
+
 let humanScore = 0;
 let computerScore = 0;
-function computerChoice () {
-    let choice = Math.floor(Math.random() * 3);
-    return choices[choice].toLocaleLowerCase();
+let playedRounds = 0;
+
+const res = document.querySelector(".results");
+const reset = document.querySelector("#reset");
+
+function resset() {
+    res.innerHTML = "";
+    humanScore = 0;
+    computerScore = 0;
+    playedRounds = 0;
 }
 
+function getComputerChoice() {
+    const choice = Math.floor(Math.random() * choices.length);
+    return choices[choice].toLowerCase();
+}
 
-function humanChoice () {
-    let choice = prompt("Please select Rock, Paper or Scissors!", "Rock");
-    let userChoice = choice.toLowerCase();
-        if (!(userChoice === "rock" || userChoice === "paper" || userChoice === "scissors" )) {
-            console.log("Please select Rock, Paper or Scissors. Your selection was invalid!")
+function evaluateRound(playerChoice, computerChoice) {
+    if (playerChoice == computerChoice) {
+        return "draw";
+    } else if (playerChoice == "rock" && computerChoice == "scissors" ||
+        playerChoice == "scissors" && computerChoice == "paper" ||
+        playerChoice == "paper" && computerChoice == "rock") {
+            return "player"
         } else {
-            return userChoice;
+            return "computer"
         }
-}
+    }
 
-function playRound (humanChoice, computerChoice) {
-    if (humanChoice === computerChoice) {
-        console.log("It's a tie!")
-    } else if (humanChoice === "rock" && computerChoice === "scissors") {
-        humanScore += 1;
-        console.log(`You have won! Rock beats Scissors. Your score is ${humanScore}`)
-    } else if (humanChoice === "paper" && computerChoice === "rock") {
-        humanScore += 1;
-        console.log(`You have won! Paper beats Rock. Your score is ${humanScore}`)
-    } else if (computerChoice === "rock" && humanChoice === "scissors") {
-        computerScore += 1;
-        console.log(`Computer have won! Rock beats Scissors. Your score is ${computerScore}`)
-    } else if (computerChoice === "paper" && humanChoice === "rock") {
-        computerScore += 1;
-        console.log(`Computer have won! Paper beats Rock. Your score is ${computerScore}`)
+function endGame() {
+    console.log("Game over!");
+
+    if (humanScore > computerScore) {
+        res.innerHTML += `You won! Final score: ${humanScore} - ${computerScore}`;
+    } else if (computerScore > humanScore) {
+        res.innerHTML += `You lost! Final score: ${computerScore} - ${humanScore}`;
+    } else {
+        res.innerHTML += `It's a draw! Final score: ${humanScore} - ${computerScore}`;
     }
 }
+
+
+function playRound(playerChoice) {
+    const computerChoice = getComputerChoice();
+    const result = evaluateRound(playerChoice,computerChoice);
+
+    if (result == "draw") {
+        res.innerHTML += `It's a tie! Both chosen ${computerChoice}<br>`
+    } else if ( result == "player") {
+        res.innerHTML += `Player wins by choosing ${playerChoice}<br>`
+        humanScore++;
+    } else {
+        res.innerHTML += `Computer wins by choosing ${computerChoice}<br>`;
+        computerScore++;
+    }
+    playedRounds++;
+
+    if(playedRounds === 5) {
+        endGame()
+    }
+}
+
 
 function playGame() {
-    playRound(humanChoice(),computerChoice());
-    playRound(humanChoice(),computerChoice());
-    playRound(humanChoice(),computerChoice());
-    playRound(humanChoice(),computerChoice());
-    playRound(humanChoice(),computerChoice());
 
-    if (humanScore === computerScore) {
-        console.log(`It's a tie!!`)
+        const btn = document.querySelectorAll("button");
 
-      
-    } else if (humanScore > computerScore) {
-        console.log(`Human has won with ${humanScore} score!`)
-    } else {
-        console.log(`Computer has won with ${computerScore} score!`)
-
-    }
+        btn.forEach((button) => {
+            button.addEventListener("click", () => {
+                if (playedRounds < 5) {
+                let playerChoice = button.id.toLowerCase();
+                playRound(playerChoice)
+            }})
+                  })
+    
 }
 
-playGame()
+playGame();
+
+reset.addEventListener("click", resset);
